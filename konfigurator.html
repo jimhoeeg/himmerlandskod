@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Himmerlandskød · Sortiments- & Koncept-Konfigurator</title>
+<meta name="description" content="Et B2B-værktøj der matcher din forretning med det rette Himmerlandskød – og uddanner dig i merværdien undervejs.">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          forest:   '#233B2E',
+          'forest-2':'#2C4A3A',
+          pine:     '#37503F',
+          'pine-line':'#4A6353',
+          brass:    '#A98A52',
+          'brass-l':'#C2A56A',
+          'brass-d':'#8F723F',
+          cream:    '#F4F0E6',
+          'cream-2':'#EAE3D2',
+          ink:      '#1B2A21',
+        },
+        fontFamily: {
+          display: ['"Cormorant Garamond"','Georgia','serif'],
+          sans: ['"Figtree"','"Helvetica Neue"','Arial','sans-serif'],
+        }
+      }
+    }
+  }
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#233B2E; --brass:#A98A52; --cream:#F4F0E6;
+  }
+  html{scroll-behavior:smooth}
+  body{font-family:"Figtree","Helvetica Neue",Arial,sans-serif;background:#233B2E;color:#1B2A21;-webkit-font-smoothing:antialiased}
+  .font-display{font-family:"Cormorant Garamond",Georgia,serif}
+  /* wordmark spacing like the site */
+  .wordmark{letter-spacing:.22em}
+  /* fade / slide transitions for screens */
+  .screen{display:none}
+  .screen.active{display:block;animation:fadeUp .5s cubic-bezier(.2,.7,.2,1)}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  .q-anim{animation:fadeUp .45s cubic-bezier(.2,.7,.2,1)}
+  .edu-anim{animation:eduIn .4s cubic-bezier(.2,.7,.2,1)}
+  @keyframes eduIn{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}
+  .pop{animation:popIn .35s cubic-bezier(.2,.8,.2,1)}
+  @keyframes popIn{from{opacity:0;transform:scale(.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+  /* slider styling */
+  input[type=range]{-webkit-appearance:none;appearance:none;height:6px;border-radius:99px;background:linear-gradient(90deg,#A98A52,#C2A56A);outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;height:28px;width:28px;border-radius:50%;background:#F4F0E6;border:4px solid #A98A52;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.3);transition:transform .15s}
+  input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.12)}
+  input[type=range]::-moz-range-thumb{height:24px;width:24px;border-radius:50%;background:#F4F0E6;border:4px solid #A98A52;cursor:pointer}
+  /* selected option */
+  .opt.selected{border-color:#A98A52;background:#37503F;box-shadow:0 0 0 1px #A98A52, 0 14px 30px -12px rgba(0,0,0,.55)}
+  .opt.selected .opt-check{opacity:1;transform:scale(1)}
+  /* subtle grain bg */
+  .hero-bg{background:radial-gradient(120% 90% at 50% -10%, #2C4A3A 0%, #233B2E 55%, #1B2E24 100%)}
+  .ring-progress{transition:width .5s cubic-bezier(.2,.7,.2,1)}
+  /* scrollbar */
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:#4A6353;border-radius:99px}
+  .bull{filter:drop-shadow(0 2px 6px rgba(0,0,0,.25))}
+  .divider-brass{height:2px;width:64px;background:#A98A52}
+  details>summary{list-style:none;cursor:pointer}
+  details>summary::-webkit-details-marker{display:none}
+  .tip{position:relative}
+  .tip .tip-body{visibility:hidden;opacity:0;transition:.2s;position:absolute;z-index:40}
+  .tip:hover .tip-body,.tip:focus-within .tip-body{visibility:visible;opacity:1}
+</style>
+</head>
+<body class="min-h-screen hero-bg text-cream">
+
+<!-- ============ HEADER ============ -->
+<header class="sticky top-0 z-30 backdrop-blur-md">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6">
+    <div class="mt-3 rounded-full bg-forest/85 ring-1 ring-pine-line/40 shadow-lg shadow-black/20 flex items-center justify-between px-5 sm:px-8 py-3">
+      <button onclick="goHome()" class="wordmark font-display text-brass-l text-xl sm:text-2xl font-bold hover:text-brass transition">HIMMERLANDSKØD</button>
+      <svg class="bull hidden sm:block" width="58" height="34" viewBox="0 0 64 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6 16c-2-3-4-4-5-9 4 2 7 2 9 5 3-2 7-3 12-3 8 0 13 4 17 4 5 0 7-3 12-3 3 0 5 1 7 3 2-1 4-1 6 0-1 2-3 3-6 3 1 3 0 6-2 8 1 3 0 6-2 8-2-1-3-3-3-6-3 2-7 3-12 3-2 4-5 6-9 6 1-3 1-5 0-7-3 1-6 1-9 0-1 3-3 5-7 5 1-3 1-5 0-7-4-1-7-4-8-8-1 0-2 0-3 1 1-3 3-4 6-4z" fill="#A98A52"/>
+      </svg>
+      <nav class="flex items-center gap-2 text-sm">
+        <span id="navStep" class="hidden sm:inline text-cream-2/70">Konfigurator</span>
+        <button onclick="goHome()" id="restartBtn" class="hidden rounded-full border border-brass/50 text-brass-l px-4 py-1.5 hover:bg-brass hover:text-forest transition">Forfra</button>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main class="mx-auto max-w-7xl px-4 sm:px-6 pb-24 pt-8 sm:pt-12">
+
+  <!-- ============ SCREEN: PROFILE ============ -->
+  <section id="screen-profile" class="screen active">
+    <div class="text-center max-w-3xl mx-auto">
+      <p class="text-brass-l tracking-[.3em] text-xs sm:text-sm font-semibold uppercase">Sortiments- &amp; Koncept-Konfigurator</p>
+      <h1 class="font-display text-4xl sm:text-6xl font-bold mt-4 leading-tight">Find det rette kød<br><span class="text-brass-l">til din forretning</span></h1>
+      <p class="mt-6 text-cream-2/80 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
+        Svar på nogle få spørgsmål om din drift — så matcher vi dig med præcis de udskæringer og koncepter fra Himmerlandskød, der løfter din bundlinje. Undervejs deler vi fagligheden bag hvert valg: lavt svind, høj dækningsgrad, ægte dyrevelfærd og 100 % dansk kvalitet.
+      </p>
+      <div class="divider-brass mx-auto mt-8 mb-10"></div>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+      <!-- Card template -->
+      <button onclick="startTrack('restaurant')" class="group text-left rounded-2xl bg-forest-2/70 ring-1 ring-pine-line/40 p-7 hover:ring-brass hover:bg-pine/70 transition-all duration-300 hover:-translate-y-1 shadow-xl shadow-black/20">
+        <div class="h-12 w-12 rounded-xl bg-brass/15 ring-1 ring-brass/40 grid place-items-center text-brass-l mb-5 group-hover:bg-brass group-hover:text-forest transition">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 3v8M11 3v8M9 11v10M5 3v4a2 2 0 002 2M17 3c-1.5 0-3 2-3 5s1.5 4 3 4v9"/></svg>
+        </div>
+        <h3 class="font-display text-2xl font-semibold">Restaurant &amp; Kantine</h3>
+        <p class="mt-2 text-sm text-cream-2/70 leading-relaxed">Kokken og køkkenchefen. Ensartethed, saftighed og pris pr. kuvert.</p>
+        <span class="mt-5 inline-flex items-center gap-2 text-brass-l text-sm font-semibold">Start her <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="group-hover:translate-x-1 transition"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </button>
+
+      <button onclick="startTrack('slagter')" class="group text-left rounded-2xl bg-forest-2/70 ring-1 ring-pine-line/40 p-7 hover:ring-brass hover:bg-pine/70 transition-all duration-300 hover:-translate-y-1 shadow-xl shadow-black/20">
+        <div class="h-12 w-12 rounded-xl bg-brass/15 ring-1 ring-brass/40 grid place-items-center text-brass-l mb-5 group-hover:bg-brass group-hover:text-forest transition">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l8-8 4 4M14 7l7 7-3 3-7-7M9 13l-6 6 2 2 6-6"/></svg>
+        </div>
+        <h3 class="font-display text-2xl font-semibold">High-end Slagter</h3>
+        <p class="mt-2 text-sm text-cream-2/70 leading-relaxed">Disken der sælger. Avance, krogmodning og specialprodukter.</p>
+        <span class="mt-5 inline-flex items-center gap-2 text-brass-l text-sm font-semibold">Start her <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="group-hover:translate-x-1 transition"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </button>
+
+      <button onclick="startTrack('grossist')" class="group text-left rounded-2xl bg-forest-2/70 ring-1 ring-pine-line/40 p-7 hover:ring-brass hover:bg-pine/70 transition-all duration-300 hover:-translate-y-1 shadow-xl shadow-black/20">
+        <div class="h-12 w-12 rounded-xl bg-brass/15 ring-1 ring-brass/40 grid place-items-center text-brass-l mb-5 group-hover:bg-brass group-hover:text-forest transition">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7l9-4 9 4-9 4-9-4zM3 7v10l9 4 9-4V7M12 11v10"/></svg>
+        </div>
+        <h3 class="font-display text-2xl font-semibold">Kødsælger / Grossist</h3>
+        <p class="mt-2 text-sm text-cream-2/70 leading-relaxed">Salgsargumenterne. Yield, ESG-dokumentation og indvendinger.</p>
+        <span class="mt-5 inline-flex items-center gap-2 text-brass-l text-sm font-semibold">Start her <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="group-hover:translate-x-1 transition"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </button>
+    </div>
+
+    <div class="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs text-cream-2/60">
+      <span class="inline-flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-brass"></span>100 % dansk kød</span>
+      <span class="inline-flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-brass"></span>Statslige dyrevelfærdshjerter</span>
+      <span class="inline-flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-brass"></span>10–15 % mindre svind</span>
+      <span class="inline-flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-brass"></span>Kort transport · Aalestrup</span>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN: QUIZ ============ -->
+  <section id="screen-quiz" class="screen">
+    <!-- progress -->
+    <div class="max-w-5xl mx-auto mb-7">
+      <div class="flex items-center justify-between text-xs text-cream-2/70 mb-2">
+        <span id="trackLabel" class="font-semibold tracking-wide uppercase text-brass-l"></span>
+        <span id="qCounter"></span>
+      </div>
+      <div class="h-1.5 rounded-full bg-pine/60 overflow-hidden">
+        <div id="progressBar" class="ring-progress h-full rounded-full bg-gradient-to-r from-brass to-brass-l" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="grid lg:grid-cols-5 gap-6 max-w-6xl mx-auto items-start">
+      <!-- question column -->
+      <div class="lg:col-span-3">
+        <div id="questionCard" class="rounded-2xl bg-forest-2/60 ring-1 ring-pine-line/40 p-6 sm:p-8 shadow-xl shadow-black/20">
+          <!-- injected -->
+        </div>
+        <div class="mt-5 flex items-center justify-between">
+          <button id="backBtn" onclick="prevQuestion()" class="inline-flex items-center gap-2 text-sm text-cream-2/70 hover:text-cream transition px-3 py-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 18l-6-6 6-6"/></svg> Tilbage
+          </button>
+          <button id="nextBtn" onclick="nextQuestion()" disabled class="inline-flex items-center gap-2 rounded-full bg-brass text-forest font-semibold px-7 py-3 shadow-lg shadow-black/20 enabled:hover:bg-brass-l transition disabled:opacity-40 disabled:cursor-not-allowed">
+            <span id="nextLabel">Videre</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- education column -->
+      <aside class="lg:col-span-2 lg:sticky lg:top-28">
+        <div id="eduPanel" class="rounded-2xl bg-cream text-ink p-6 sm:p-7 shadow-2xl shadow-black/30 ring-1 ring-brass/30">
+          <!-- injected -->
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN: RESULT ============ -->
+  <section id="screen-result" class="screen">
+    <div id="resultRoot" class="max-w-6xl mx-auto"></div>
+  </section>
+
+</main>
+
+<footer class="border-t border-pine-line/30 bg-forest/60">
+  <div class="mx-auto max-w-7xl px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-cream-2/60">
+    <span class="wordmark font-display text-brass-l font-semibold">HIMMERLANDSKØD A/S</span>
+    <span>Nordre Ringvej 99 · DK-9620 Aalestrup · CVR DK31426340</span>
+    <span>Prototype · Sortiments- &amp; Koncept-Konfigurator</span>
+  </div>
+</footer>
+
+<!-- ============ EDU POP-UP MODAL ============ -->
+<div id="modalBackdrop" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm items-center justify-center p-4">
+  <div id="modalCard" class="pop max-w-md w-full rounded-2xl bg-cream text-ink p-7 shadow-2xl ring-1 ring-brass/40">
+    <div class="flex items-start justify-between gap-4">
+      <div class="h-10 w-10 rounded-xl bg-brass/15 ring-1 ring-brass/40 grid place-items-center text-brass-d shrink-0">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 16v-4M12 8h.01"/><circle cx="12" cy="12" r="9"/></svg>
+      </div>
+      <button onclick="closeModal()" class="text-ink/40 hover:text-ink transition"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+    <h4 id="modalTitle" class="font-display text-2xl font-bold mt-3 text-forest"></h4>
+    <p id="modalBody" class="mt-3 text-sm leading-relaxed text-ink/80"></p>
+    <div id="modalStat" class="mt-5"></div>
+    <button onclick="closeModal()" class="mt-6 w-full rounded-full bg-forest text-cream font-semibold py-3 hover:bg-pine transition">Forstået</button>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   HIMMERLANDSKØD · KONFIGURATOR — vanilla JS state machine
+   ===================================================================== */
+
+/* ---------- DATA: tracks, questions, education ---------- */
+const TRACKS = {
+  restaurant: {
+    label: "Restaurant & Kantine",
+    accent: "Køkken",
+    questions: [
+      {
+        id: "servering",
+        q: "Hvilken type servering planlægger du til?",
+        sub: "Vælg den driftsform der vejer tungest hos dig lige nu.",
+        options: [
+          {v:"alacarte", t:"À la carte", d:"Tallerkenanretning, høj forventning"},
+          {v:"buffet", t:"Stor buffet / Kantine", d:"Volumen og hold-varme"},
+          {v:"selskab", t:"Selskabsmenu", d:"Mange ens kuverter på én gang"},
+        ],
+        edu: {
+          tag:"Ensartethed",
+          title:"Samme farve. Samme bid. Hver gang.",
+          body:"Når 120 kuverter skal ud samtidig, er ensartethed alt. Kort transporttid fra Aalestrup betyder, at kødet kommer hurtigere fra slagtegang til dit køkken — mindre tid i kølekæden giver ensartet farve, pH og mørhed på tværs af hele leverancen.",
+          stat:{label:"Transport mod typisk import", value:"Kortere kølekæde", note:"Mere ensartet farve & mørhed"}
+        }
+      },
+      {
+        id: "tilberedning",
+        q: "Hvad er din primære tilberedningsmetode?",
+        sub: "Metoden afgør hvilke udskæringer der yder bedst.",
+        options: [
+          {v:"braiseret", t:"Langtidsstegning / Braiseret", d:"Bov, skank, tykkam"},
+          {v:"lyn", t:"Lynstegt / Grill", d:"Mørbrad, culotte, entrecôte"},
+          {v:"sousvide", t:"Sous-vide", d:"Præcis kernetemperatur"},
+        ],
+        edu: {
+          tag:"Marmorering",
+          title:"Fedtet der arbejder for dig",
+          body:"Den naturlige fedtmarmorering i dansk ungkvæg smelter langsomt ind i kødet under tilberedning og baster det indefra. Resultatet er saftighed der holder — også når retten skal stå på en buffet eller genopvarmes til service.",
+          stat:{label:"Intramuskulært fedt", value:"Naturlig marmorering", note:"Baster kødet indefra under varme"}
+        }
+      },
+      {
+        id: "budget",
+        type:"slider",
+        q: "Hvad er dit budget for kødet pr. kuvert?",
+        sub: "Træk i skyderen — vi regner svind med ind i det virkelige tal.",
+        slider:{min:15,max:110,step:5,start:55,unit:"kr.",maxLabel:"100+ kr."},
+        edu: {
+          tag:"Tilberedt vægt",
+          title:"Rå vægt lyver. Tilberedt vægt betaler.",
+          body:"Du serverer ikke rå vægt — du serverer tilberedt vægt. Himmerlandskød har typisk 10–15 % mindre stegesvind end standardkød, fordi vandbindingen i kvalitetskødet er højere. Det betyder flere gram på tallerkenen pr. indkøbt kilo.",
+          stat:{label:"Mindre stegesvind", value:"10–15 %", note:"Flere serverede gram pr. kg indkøbt"}
+        }
+      },
+      {
+        id: "story",
+        q: "Hvilken storytelling vægter dine gæster højest?",
+        sub: "Vi tilpasser menukort-tekst og diskeskilte efter det.",
+        options: [
+          {v:"velfaerd", t:"Dyrevelfærd", d:"Statslige velfærdshjerter"},
+          {v:"lokalt", t:"Lokalt / Dansk", d:"100 % dansk terroir"},
+          {v:"gastronomi", t:"Høj gastronomi", d:"Krogmodning & finesse"},
+        ],
+        edu: {
+          tag:"Fortælling",
+          title:"En historie gæsten gerne betaler for",
+          body:"Gæster betaler ikke kun for protein — de betaler for mening. Et menukort der nævner dansk oprindelse, dokumenteret dyrevelfærd og kort transport hæver den oplevede værdi af retten, før den overhovedet er serveret.",
+          stat:{label:"Oplevet værdi", value:"Højere betalingsvilje", note:"Når oprindelsen står på kortet"}
+        }
+      },
+    ]
+  },
+
+  slagter: {
+    label: "High-end Slagter",
+    accent: "Disken",
+    questions: [
+      {
+        id:"segment",
+        q:"Hvilket segment i din butik vil du booste lige nu?",
+        sub:"Hvor vil du flytte mest værdi over disken?",
+        options:[
+          {v:"hverdag", t:"Hverdags-luksus", d:"Det gode kød på en tirsdag"},
+          {v:"weekend", t:"Weekend-gourmeten", d:"Fredagsbøffen, det store stykke"},
+          {v:"pris", t:"Den prisbevidste kvalitetsjæger", d:"Mest kvalitet for pengene"},
+        ],
+        edu:{
+          tag:"Terroir",
+          title:"Lokalhistorien retfærdiggør kiloprisen",
+          body:"Kunden i disken accepterer en højere kilopris, når der følger en historie med: dansk terroir, dokumenteret dyrevelfærd og et navngivet oprindelsesområde. Du sælger ikke bare en bøf — du sælger Himmerland.",
+          stat:{label:"Argument for kiloprisen", value:"Dansk terroir", note:"Oprindelse + velfærd = højere pris accepteres"}
+        }
+      },
+      {
+        id:"arbejde",
+        q:"Hvordan foretrækker du at arbejde med kødet?",
+        sub:"Vi leverer i præcis det format der passer dit håndværk.",
+        options:[
+          {v:"helt", t:"Hel anatomisk udskæring", d:"Egen partering i butikken"},
+          {v:"klar", t:"Udskåret og klar", d:"Klar til disk, minimalt spild"},
+          {v:"krog", t:"Krogmodning i eget skab", d:"Dry aged på din adresse"},
+        ],
+        edu:{
+          tag:"Avance",
+          title:"Én tykkam — tre højværdi-produkter",
+          body:"En hel tykkam kan parteres til mindst tre produkter med hver sin prisklasse: tykkamsbøffer (ribeye), et flot stegestykke og afpuds til burger/hakket af topkvalitet. Du styrer selv mixet og maksimerer avancen pr. kilo råvare.",
+          stat:{label:"Fra én udskæring", value:"3 prisklasser", note:"Ribeye · stegestykke · premium fars"}
+        }
+      },
+      {
+        id:"udfordring",
+        q:"Hvad er din største udfordring i disken i dag?",
+        sub:"Vi matcher løsningen direkte til problemet.",
+        options:[
+          {v:"vaeske", t:"Væsketab / Holdbarhed", d:"Drip loss i montren"},
+          {v:"special", t:"Manglende specialprodukter", d:"Noget kæden ikke har"},
+          {v:"priskrig", t:"Priskrig", d:"Pres på marginen"},
+        ],
+        edu:{
+          tag:"Krogmodning",
+          title:"Dry aged i min. 21 dage = mindre drip loss",
+          body:"Under kontrolleret krogmodning fordamper frit vand og enzymer mørner kødet. Resultatet er dybere smag og markant mindre 'drip loss' i disken — den væske der ellers samler sig i bakken er ren tabt fortjeneste. Modnet kød taber mindre, når kunden tager det med hjem.",
+          stat:{label:"Krogmodning", value:"Min. 21 dage", note:"Mindre drip loss = mere solgt vægt"}
+        }
+      },
+    ]
+  },
+
+  grossist: {
+    label: "Kødsælger / Grossist",
+    accent: "Pitchet",
+    questions: [
+      {
+        id:"kunde",
+        q:"Hvilken type kunde skal du pitche til?",
+        sub:"Vi skræddersyer argumentkortet til beslutningstageren.",
+        options:[
+          {v:"udbud", t:"Offentligt udbud / Kommune", d:"ESG & dokumentation vægter tungt"},
+          {v:"hotel", t:"Hotel / Konferencekæde", d:"Volumen & ensartethed"},
+          {v:"kaede", t:"Kæderestaurant", d:"Pris pr. portion & forsyning"},
+        ],
+        edu:{
+          tag:"ESG",
+          title:"Dyrevelfærd og CO₂ som beslutningskriterium",
+          body:"I offentlige udbud og hos kæder med ESG-mål er dokumentation guld værd: statslige dyrevelfærdshjerter og lavere transport-CO₂ fra kort dansk forsyningskæde kan være selve det kriterium der afgør udbuddet — ikke kun kiloprisen.",
+          stat:{label:"Tildelingskriterium", value:"ESG + velfærd", note:"Hjerter & lav transport-CO₂ dokumenteret"}
+        }
+      },
+      {
+        id:"indvending",
+        q:"Hvad er kundens typiske hovedindvending?",
+        sub:"Vælg den så giver vi dig modargumentet.",
+        options:[
+          {v:"dyrt", t:"„Det er for dyrt“", d:"Pris-fokus"},
+          {v:"inspiration", t:"„Mangler inspiration“", d:"Ved ikke hvad de skal med det"},
+          {v:"maengde", t:"„Svært at få store, ensartede mængder“", d:"Forsyningsfrygt"},
+        ],
+        edu:{
+          tag:"Yield",
+          title:"Pris pr. serveret gram — ikke pr. indkøbt kilo",
+          body:"Indvendingen 'for dyrt' falder, når du regner på yield. Med 10–15 % mindre svind og højere udskæringsudbytte er prisen pr. faktisk serveret gram ofte lavere end ved billigere råvare. Det er den beregning der vinder mødet.",
+          stat:{label:"Den rigtige nøgletal", value:"Pris / serveret gram", note:"Lavere trods højere kilopris"}
+        }
+      },
+      {
+        id:"info",
+        q:"Hvilken information reagerer din kunde bedst på?",
+        sub:"Det bestemmer hvilket salgskit vi pakker til dig.",
+        options:[
+          {v:"excel", t:"Excel-beregninger", d:"Tal, yield & TCO"},
+          {v:"cert", t:"Certifikater / Dokumentation", d:"Revisorsikker bevisførelse"},
+          {v:"story", t:"Storytelling / Markedsføring", d:"Brand & oprindelse"},
+        ],
+        edu:{
+          tag:"Format",
+          title:"Mød kunden i deres eget sprog",
+          body:"En indkøbschef vil se et regneark; en kvalitetsansvarlig vil se certifikater; en marketingchef vil se historien. Vi pakker dit salgskit i præcis det format der rammer din beslutningstager — så du møder dem dér hvor beslutningen tages.",
+          stat:{label:"Tilpasset salgskit", value:"3 formater", note:"Excel · Dokumentation · Story"}
+        }
+      },
+    ]
+  }
+};
+
+/* ---------- RESULT BUILDERS ---------- */
+/* Each returns the product match config used to render the result screen. */
+function buildResult(track, a){
+  if(track==="restaurant"){
+    const method = a.tilberedning;
+    const map = {
+      braiseret:{name:"Himmerlandsokse · Tykkam & Bov", cut:"Braisering-pakke", uses:"Grydesteg, braiseret, langtidsstegt"},
+      lyn:{name:"Himmerlandsokse · Culotte & Entrecôte", cut:"Grill & lynsteg-pakke", uses:"Grill, pande, à la carte"},
+      sousvide:{name:"Himmerlandsokse · Mørbrad & Inderlår", cut:"Sous-vide præcisionspakke", uses:"Sous-vide, kernetemp-styret"},
+    };
+    const m = map[method] || map.braiseret;
+    return {
+      title: m.name,
+      subtitle: m.cut,
+      uses: m.uses,
+      badges: storyBadges(a.story),
+      calc: "shrink",
+      varenr: ["HK-"+(method==="lyn"?"CUL-220":method==="sousvide"?"MBR-180":"TKM-400"),"HK-BOV-900","HK-FARS-PREMIUM"],
+    };
+  }
+  if(track==="slagter"){
+    const work = a.arbejde;
+    const map = {
+      helt:{name:"Hel Tykkam — anatomisk", cut:"Til egen partering"},
+      klar:{name:"Udskåret diskepakke", cut:"Klar til montre"},
+      krog:{name:"Krogmodnings-program", cut:"Dry aged · min. 21 dage"},
+    };
+    const m = map[work] || map.helt;
+    return {
+      title:"Himmerlandsokse · "+m.name,
+      subtitle:m.cut,
+      uses: a.udfordring==="priskrig"?"Differentiering frem for priskrig":a.udfordring==="special"?"Specialprodukter kæden ikke har":"Holdbarhed & mindre drip loss",
+      badges:["Krogmodnet","Dansk terroir","Velfærdshjerter"],
+      calc:"margin",
+      varenr:["HK-TKM-HEL-9","HK-RIBEYE-300","HK-STEG-1200"],
+    };
+  }
+  // grossist
+  return {
+    title:"Himmerlandsokse · Foodservice-program",
+    subtitle: a.kunde==="udbud"?"Udbuds- & ESG-pakke":a.kunde==="hotel"?"Volumen & ensartethed":"Portionsstyret kædepakke",
+    uses: a.info==="excel"?"Yield- & TCO-beregning":a.info==="cert"?"Certifikat-mappe":"Brand- & storytelling-kit",
+    badges:["ESG-dokumenteret","Lav transport-CO₂","Statslige velfærdshjerter"],
+    calc:"yield",
+    varenr:["HK-FS-OKSE-STD","HK-FS-PORTION","HK-DOC-ESG"],
+  };
+}
+function storyBadges(s){
+  if(s==="velfaerd") return ["Statslige velfærdshjerter","100 % dansk","Sporbar"];
+  if(s==="lokalt") return ["100 % dansk terroir","Kort transport","Aalestrup"];
+  return ["Krogmodnet","Høj gastronomi","Dansk ungkvæg"];
+}
+
+/* ---------- STATE ---------- */
+let state = { track:null, qIndex:0, answers:{} };
+
+/* ---------- NAV HELPERS ---------- */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goHome(){
+  state = {track:null,qIndex:0,answers:{}};
+  document.getElementById('restartBtn').classList.add('hidden');
+  showScreen('screen-profile');
+}
+function startTrack(t){
+  state.track = t; state.qIndex = 0; state.answers = {};
+  document.getElementById('restartBtn').classList.remove('hidden');
+  showScreen('screen-quiz');
+  renderQuestion();
+}
+
+/* ---------- RENDER QUESTION ---------- */
+function renderQuestion(){
+  const track = TRACKS[state.track];
+  const q = track.questions[state.qIndex];
+  const total = track.questions.length;
+
+  document.getElementById('trackLabel').textContent = track.label;
+  document.getElementById('qCounter').textContent = `Spørgsmål ${state.qIndex+1} af ${total}`;
+  document.getElementById('progressBar').style.width = ((state.qIndex)/total*100)+'%';
+
+  const card = document.getElementById('questionCard');
+  const saved = state.answers[q.id];
+
+  let inner = `<div class="q-anim">
+    <span class="inline-block text-xs font-semibold tracking-wider uppercase text-brass-l mb-3">${track.accent} · trin ${state.qIndex+1}</span>
+    <h2 class="font-display text-2xl sm:text-3xl font-semibold leading-tight">${q.q}</h2>
+    <p class="text-cream-2/70 text-sm mt-2">${q.sub}</p>`;
+
+  if(q.type==="slider"){
+    const s=q.slider; const val = (saved!=null?saved:s.start);
+    inner += `
+      <div class="mt-8">
+        <div class="flex items-end justify-between mb-4">
+          <div>
+            <div class="text-cream-2/60 text-xs uppercase tracking-wide">Dit budget pr. kuvert</div>
+            <div id="sliderVal" class="font-display text-5xl font-bold text-brass-l">${val>=s.max?s.maxLabel:val+' '+s.unit}</div>
+          </div>
+          <div class="text-right text-xs text-cream-2/60">Råt indkøb<br><span class="text-cream-2/40">før svind</span></div>
+        </div>
+        <input id="rangeInput" type="range" min="${s.min}" max="${s.max}" step="${s.step}" value="${val}" class="w-full">
+        <div class="flex justify-between text-xs text-cream-2/50 mt-2"><span>${s.min} ${s.unit}</span><span>${s.maxLabel}</span></div>
+        <div id="sliderInsight" class="mt-6 rounded-xl bg-pine/40 ring-1 ring-pine-line/40 p-4 text-sm"></div>
+      </div>`;
+  } else {
+    inner += `<div class="mt-6 grid gap-3">`;
+    q.options.forEach((o,i)=>{
+      const sel = saved===o.v ? 'selected' : '';
+      inner += `
+      <button class="opt ${sel} group text-left rounded-xl border border-pine-line/40 bg-forest-2/40 p-4 hover:border-brass/70 transition flex items-center gap-4"
+        onclick="selectOption('${q.id}','${o.v}', this)" data-edu="${i}">
+        <span class="opt-radio h-5 w-5 rounded-full border-2 border-brass/60 grid place-items-center shrink-0">
+          <span class="opt-check h-2.5 w-2.5 rounded-full bg-brass-l opacity-0 scale-0 transition"></span>
+        </span>
+        <span class="flex-1">
+          <span class="block font-semibold text-cream">${o.t}</span>
+          <span class="block text-xs text-cream-2/60 mt-0.5">${o.d}</span>
+        </span>
+        <button type="button" onclick="event.stopPropagation();openModal('${state.track}',${state.qIndex})" class="tip shrink-0 text-brass-l/70 hover:text-brass-l" title="Hvorfor spørger vi?">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>
+        </button>
+      </button>`;
+    });
+    inner += `</div>`;
+  }
+  inner += `</div>`;
+  card.innerHTML = inner;
+
+  // education panel
+  renderEdu(q.edu);
+
+  // slider wiring
+  if(q.type==="slider"){
+    const r = document.getElementById('rangeInput');
+    const updateSlider = ()=>{
+      const v = parseInt(r.value,10);
+      document.getElementById('sliderVal').textContent = v>=q.slider.max ? q.slider.maxLabel : v+' '+q.slider.unit;
+      state.answers[q.id]=v;
+      // live insight: tilberedt vægt
+      const shrinkStd = 0.30, shrinkHK = 0.185; // typical 30% vs ~18.5% shrink
+      const servedStd = v*(1-shrinkStd), servedHK = v*(1-shrinkHK);
+      const extra = (servedHK-servedStd);
+      document.getElementById('sliderInsight').innerHTML =
+        `<div class="flex items-center justify-between"><span class="text-cream-2/70">Værdi på tallerkenen (standardkød)</span><span class="font-semibold text-cream-2">${servedStd.toFixed(0)} kr.</span></div>
+         <div class="flex items-center justify-between mt-1"><span class="text-cream-2/70">Værdi på tallerkenen (Himmerlandskød)</span><span class="font-semibold text-brass-l">${servedHK.toFixed(0)} kr.</span></div>
+         <div class="mt-3 pt-3 border-t border-pine-line/40 flex items-center justify-between"><span class="text-cream">Reelt mere serveret pr. kuvert</span><span class="font-display text-2xl font-bold text-brass-l">+${extra.toFixed(0)} kr.</span></div>`;
+      enableNext();
+    };
+    r.addEventListener('input',updateSlider);
+    updateSlider();
+  }
+
+  // buttons
+  document.getElementById('backBtn').style.visibility = state.qIndex===0 ? 'hidden':'visible';
+  document.getElementById('nextLabel').textContent = (state.qIndex===total-1)?'Se mit match':'Videre';
+  if(saved!=null) enableNext(); else disableNext();
+}
+
+function renderEdu(edu){
+  const p = document.getElementById('eduPanel');
+  p.innerHTML = `<div class="edu-anim">
+    <div class="flex items-center gap-2 mb-4">
+      <span class="h-9 w-9 rounded-lg bg-brass/15 ring-1 ring-brass/40 grid place-items-center text-brass-d">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l2.4 7.4H22l-6 4.4 2.3 7.2L12 16.6 5.7 21l2.3-7.2-6-4.4h7.6z"/></svg>
+      </span>
+      <span class="text-xs font-bold tracking-widest uppercase text-brass-d">${edu.tag}</span>
+    </div>
+    <h3 class="font-display text-2xl font-bold text-forest leading-tight">${edu.title}</h3>
+    <p class="mt-3 text-sm leading-relaxed text-ink/75">${edu.body}</p>
+    <div class="mt-5 rounded-xl bg-forest text-cream p-4">
+      <div class="text-[11px] uppercase tracking-wide text-cream-2/60">${edu.stat.label}</div>
+      <div class="font-display text-3xl font-bold text-brass-l mt-0.5">${edu.stat.value}</div>
+      <div class="text-xs text-cream-2/70 mt-1">${edu.stat.note}</div>
+    </div>
+    <div class="mt-4 flex items-center gap-2 text-[11px] text-ink/50">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+      Fakta opdateres for hvert spørgsmål, du besvarer
+    </div>
+  </div>`;
+}
+
+/* ---------- OPTION SELECT ---------- */
+function selectOption(qid,val,el){
+  state.answers[qid]=val;
+  el.parentElement.querySelectorAll('.opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  enableNext();
+}
+function enableNext(){ const b=document.getElementById('nextBtn'); b.disabled=false; }
+function disableNext(){ const b=document.getElementById('nextBtn'); b.disabled=true; }
+
+/* ---------- NEXT / PREV ---------- */
+function nextQuestion(){
+  const track = TRACKS[state.track];
+  if(state.qIndex < track.questions.length-1){
+    state.qIndex++; renderQuestion();
+  } else {
+    renderResult();
+  }
+}
+function prevQuestion(){
+  if(state.qIndex>0){ state.qIndex--; renderQuestion(); }
+}
+
+/* ---------- MODAL ---------- */
+function openModal(track,qi){
+  const edu = TRACKS[track].questions[qi].edu;
+  document.getElementById('modalTitle').textContent = edu.title;
+  document.getElementById('modalBody').textContent = edu.body;
+  document.getElementById('modalStat').innerHTML =
+    `<div class="rounded-xl bg-forest text-cream p-4">
+      <div class="text-[11px] uppercase tracking-wide text-cream-2/60">${edu.stat.label}</div>
+      <div class="font-display text-3xl font-bold text-brass-l">${edu.stat.value}</div>
+      <div class="text-xs text-cream-2/70 mt-1">${edu.stat.note}</div>
+    </div>`;
+  const b=document.getElementById('modalBackdrop');
+  b.classList.remove('hidden'); b.classList.add('flex');
+}
+function closeModal(){
+  const b=document.getElementById('modalBackdrop');
+  b.classList.add('hidden'); b.classList.remove('flex');
+}
+document.getElementById('modalBackdrop').addEventListener('click',e=>{if(e.target.id==='modalBackdrop')closeModal();});
+
+/* ---------- RESULT SCREEN ---------- */
+function renderResult(){
+  const r = buildResult(state.track, state.answers);
+  const root = document.getElementById('resultRoot');
+
+  const badges = r.badges.map(b=>`<span class="inline-flex items-center gap-1.5 rounded-full bg-brass/15 ring-1 ring-brass/40 text-brass-l text-xs font-semibold px-3 py-1.5"><span class="h-1.5 w-1.5 rounded-full bg-brass"></span>${b}</span>`).join('');
+  const varenr = r.varenr.map(v=>`<code class="inline-block rounded bg-forest-2 ring-1 ring-pine-line/40 px-2 py-1 text-xs text-brass-l">${v}</code>`).join(' ');
+
+  root.innerHTML = `
+  <div class="text-center max-w-2xl mx-auto">
+    <span class="inline-flex items-center gap-2 rounded-full bg-brass/15 ring-1 ring-brass/40 text-brass-l text-xs font-semibold px-4 py-2 uppercase tracking-wider">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Dit skræddersyede match
+    </span>
+    <h2 class="font-display text-3xl sm:text-5xl font-bold mt-5 leading-tight">${r.title}</h2>
+    <p class="text-cream-2/80 mt-3">${r.subtitle} · <span class="text-brass-l">${r.uses}</span></p>
+    <div class="flex flex-wrap justify-center gap-2 mt-6">${badges}</div>
+  </div>
+
+  <div class="grid lg:grid-cols-2 gap-6 mt-10 items-start">
+    <!-- LIVE TOOL -->
+    <div class="rounded-2xl bg-cream text-ink p-6 sm:p-8 shadow-2xl ring-1 ring-brass/30">
+      ${renderTool(r.calc)}
+    </div>
+
+    <!-- BATTLE CARD + VARENR -->
+    <div class="space-y-6">
+      <div class="rounded-2xl bg-forest-2/70 ring-1 ring-pine-line/40 p-6 sm:p-7 shadow-xl">
+        <h3 class="font-display text-2xl font-bold text-cream">${battleTitle()}</h3>
+        <ul class="mt-4 space-y-3 text-sm">${battlePoints()}</ul>
+      </div>
+      <div class="rounded-2xl bg-forest-2/50 ring-1 ring-pine-line/40 p-6">
+        <div class="text-xs uppercase tracking-wide text-cream-2/60 mb-2">Præcise varenumre</div>
+        <div class="flex flex-wrap gap-2">${varenr}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEAD FORM -->
+  <div class="mt-10 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-brass/30 grid md:grid-cols-5">
+    <div class="md:col-span-2 bg-forest p-7 sm:p-9 flex flex-col justify-center">
+      <h3 class="font-display text-2xl sm:text-3xl font-bold text-cream leading-tight">Få det hele samlet i din indbakke</h3>
+      <p class="mt-4 text-sm text-cream-2/80 leading-relaxed">Download dit skræddersyede salgskit / menu-pakke som PDF + printklare diskeskilte og præcise varenumre direkte til din indbakke.</p>
+      <ul class="mt-6 space-y-2 text-sm text-cream-2/80">
+        <li class="flex gap-2"><span class="text-brass-l">✓</span> Skræddersyet PDF-salgskit</li>
+        <li class="flex gap-2"><span class="text-brass-l">✓</span> Printklare diskeskilte</li>
+        <li class="flex gap-2"><span class="text-brass-l">✓</span> Præcise varenumre & bestilling</li>
+      </ul>
+    </div>
+    <form class="md:col-span-3 bg-cream text-ink p-7 sm:p-9" onsubmit="submitLead(event)">
+      <div class="grid sm:grid-cols-2 gap-4">
+        <label class="block">
+          <span class="text-xs font-semibold text-ink/60 uppercase tracking-wide">Firma</span>
+          <input required type="text" class="mt-1 w-full rounded-lg border border-ink/15 bg-white px-4 py-3 text-sm focus:border-brass focus:ring-2 focus:ring-brass/30 outline-none" placeholder="Din virksomhed">
+        </label>
+        <label class="block">
+          <span class="text-xs font-semibold text-ink/60 uppercase tracking-wide">Navn</span>
+          <input required type="text" class="mt-1 w-full rounded-lg border border-ink/15 bg-white px-4 py-3 text-sm focus:border-brass focus:ring-2 focus:ring-brass/30 outline-none" placeholder="Fornavn Efternavn">
+        </label>
+        <label class="block">
+          <span class="text-xs font-semibold text-ink/60 uppercase tracking-wide">E-mail</span>
+          <input required type="email" class="mt-1 w-full rounded-lg border border-ink/15 bg-white px-4 py-3 text-sm focus:border-brass focus:ring-2 focus:ring-brass/30 outline-none" placeholder="dig@firma.dk">
+        </label>
+        <label class="block">
+          <span class="text-xs font-semibold text-ink/60 uppercase tracking-wide">CVR</span>
+          <input required type="text" inputmode="numeric" class="mt-1 w-full rounded-lg border border-ink/15 bg-white px-4 py-3 text-sm focus:border-brass focus:ring-2 focus:ring-brass/30 outline-none" placeholder="8 cifre">
+        </label>
+      </div>
+      <button type="submit" class="mt-6 w-full rounded-full bg-forest text-cream font-semibold py-4 hover:bg-pine transition inline-flex items-center justify-center gap-2">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+        Send mit salgskit
+      </button>
+      <p class="mt-3 text-[11px] text-ink/50 text-center">Vi behandler dine oplysninger efter Himmerlandskøds persondatapolitik. Ingen spam.</p>
+    </form>
+  </div>
+
+  <div class="text-center mt-10">
+    <button onclick="goHome()" class="text-sm text-cream-2/70 hover:text-cream transition inline-flex items-center gap-2">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 109-9M3 12l4-4M3 12l4 4"/></svg> Start en ny konfiguration
+    </button>
+  </div>`;
+
+  // progress full
+  document.getElementById('progressBar').style.width='100%';
+  showScreen('screen-result');
+  wireTool(r.calc);
+}
+
+/* ---------- BATTLE CARD CONTENT (per track) ---------- */
+function battleTitle(){
+  return {restaurant:"Battle Card · Køkkenet",slagter:"Battle Card · Disken",grossist:"Battle Card · Pitchet"}[state.track];
+}
+function battlePoints(){
+  const li = (h,t)=>`<li class="flex gap-3"><span class="text-brass-l mt-0.5">▸</span><span><span class="font-semibold text-cream">${h}</span> <span class="text-cream-2/70">${t}</span></span></li>`;
+  if(state.track==="restaurant"){
+    return li("10–15 % mindre stegesvind.","Flere serverede gram pr. indkøbt kilo — bedre madkost-økonomi.")
+         + li("Ensartet farve & mørhed.","Kort kølekæde fra Aalestrup giver forudsigelig kvalitet i hver leverance.")
+         + li("Naturlig marmorering.","Holder retten saftig — også på buffet og ved genopvarmning.")
+         + li("Fortælling på kortet.","Dansk oprindelse + velfærd hæver gæstens betalingsvilje.");
+  }
+  if(state.track==="slagter"){
+    return li("Én tykkam → 3 prisklasser.","Ribeye, stegestykke og premium fars maksimerer avancen pr. kg.")
+         + li("Krogmodnet min. 21 dage.","Dybere smag og mindre drip loss = mere solgt vægt i disken.")
+         + li("Dansk terroir sælger.","Lokalhistorien retfærdiggør den højere kilopris over disken.")
+         + li("Specialprodukter.","Differentiér dig fra kædernes standardsortiment — undgå priskrig.");
+  }
+  return li("Pris pr. serveret gram.","Lavere trods højere kilopris — yield slår listepris.")
+       + li("ESG-dokumentation.","Statslige velfærdshjerter og lav transport-CO₂ — vinder udbud.")
+       + li("Ensartet volumen.","Stabil dansk forsyning af store, ens mængder.")
+       + li("Salgskit i 3 formater.","Excel, certifikater eller story — mød beslutningstageren rigtigt.");
+}
+
+/* ---------- LIVE TOOLS ---------- */
+function renderTool(type){
+  if(type==="shrink"){
+    return `
+    <div class="flex items-center gap-2 mb-1"><span class="text-xs font-bold tracking-widest uppercase text-brass-d">Live beregner</span></div>
+    <h3 class="font-display text-2xl font-bold text-forest">Svind- &amp; kuvertberegner</h3>
+    <p class="text-sm text-ink/70 mt-1">Se hvor meget mere kød der reelt når tallerkenen.</p>
+    <div class="mt-6 space-y-5">
+      <label class="block"><div class="flex justify-between text-sm"><span class="font-semibold">Antal kuverter / uge</span><span id="t-covers-v" class="text-brass-d font-bold">400</span></div>
+        <input id="t-covers" type="range" min="50" max="2000" step="50" value="400" class="w-full mt-2"></label>
+      <label class="block"><div class="flex justify-between text-sm"><span class="font-semibold">Rå portion (gram)</span><span id="t-portion-v" class="text-brass-d font-bold">180 g</span></div>
+        <input id="t-portion" type="range" min="100" max="350" step="10" value="180" class="w-full mt-2"></label>
+    </div>
+    <div class="mt-7 grid grid-cols-2 gap-3">
+      <div class="rounded-xl bg-cream-2 p-4 text-center"><div class="text-[11px] uppercase text-ink/50">Mer-serveret / uge</div><div id="t-out-grams" class="font-display text-3xl font-bold text-forest">–</div></div>
+      <div class="rounded-xl bg-forest text-cream p-4 text-center"><div class="text-[11px] uppercase text-cream-2/60">Sparet råvare / år</div><div id="t-out-kg" class="font-display text-3xl font-bold text-brass-l">–</div></div>
+    </div>
+    <p class="text-[11px] text-ink/45 mt-3">Baseret på ~12 %-point lavere stegesvind end standardkød. Vejledende.</p>`;
+  }
+  if(type==="margin"){
+    return `
+    <div class="flex items-center gap-2 mb-1"><span class="text-xs font-bold tracking-widest uppercase text-brass-d">Live beregner</span></div>
+    <h3 class="font-display text-2xl font-bold text-forest">Avance-beregner · Hel tykkam</h3>
+    <p class="text-sm text-ink/70 mt-1">Partér til 3 produkter og se avancen pr. udskæring.</p>
+    <div class="mt-6 space-y-5">
+      <label class="block"><div class="flex justify-between text-sm"><span class="font-semibold">Indkøbspris / kg</span><span id="t-buy-v" class="text-brass-d font-bold">95 kr.</span></div>
+        <input id="t-buy" type="range" min="60" max="160" step="5" value="95" class="w-full mt-2"></label>
+      <label class="block"><div class="flex justify-between text-sm"><span class="font-semibold">Vægt hel tykkam (kg)</span><span id="t-weight-v" class="text-brass-d font-bold">9 kg</span></div>
+        <input id="t-weight" type="range" min="5" max="14" step="1" value="9" class="w-full mt-2"></label>
+    </div>
+    <div class="mt-6 rounded-xl bg-cream-2 divide-y divide-ink/10 text-sm">
+      <div class="flex justify-between px-4 py-2.5"><span>Ribeye-bøffer (45 %)</span><span id="m-ribeye" class="font-semibold">–</span></div>
+      <div class="flex justify-between px-4 py-2.5"><span>Stegestykke (35 %)</span><span id="m-steg" class="font-semibold">–</span></div>
+      <div class="flex justify-between px-4 py-2.5"><span>Premium fars (15 %)</span><span id="m-fars" class="font-semibold">–</span></div>
+    </div>
+    <div class="mt-4 rounded-xl bg-forest text-cream p-4 flex items-center justify-between">
+      <span class="text-sm">Brutto-avance pr. tykkam</span><span id="m-total" class="font-display text-3xl font-bold text-brass-l">–</span>
+    </div>
+    <p class="text-[11px] text-ink/45 mt-3">Vejl. udsalgspriser: ribeye 380 kr/kg · steg 220 kr/kg · fars 150 kr/kg. 5 % afpuds.</p>`;
+  }
+  // yield
+  return `
+    <div class="flex items-center gap-2 mb-1"><span class="text-xs font-bold tracking-widest uppercase text-brass-d">Live beregner</span></div>
+    <h3 class="font-display text-2xl font-bold text-forest">Yield-beregner · Pris pr. serveret gram</h3>
+    <p class="text-sm text-ink/70 mt-1">Modbevis "det er for dyrt" med kundens egne tal.</p>
+    <div class="mt-6 space-y-5">
+      <label class="block"><div class="flex justify-between text-sm"><span class="font-semibold">Standardkød · kilopris</span><span id="t-std-v" class="text-brass-d font-bold">80 kr.</span></div>
+        <input id="t-std" type="range" min="50" max="150" step="5" value="80" class="w-full mt-2"></label>
+      <label class="block"><div class="flex justify-between text-sm"><span class="font-semibold">Himmerlandskød · kilopris</span><span id="t-hk-v" class="text-brass-d font-bold">98 kr.</span></div>
+        <input id="t-hk" type="range" min="50" max="180" step="5" value="98" class="w-full mt-2"></label>
+    </div>
+    <div class="mt-7 grid grid-cols-2 gap-3 text-center">
+      <div class="rounded-xl bg-cream-2 p-4"><div class="text-[11px] uppercase text-ink/50">Standard · pr. serveret kg</div><div id="y-std" class="font-display text-2xl font-bold text-forest">–</div></div>
+      <div class="rounded-xl bg-forest text-cream p-4"><div class="text-[11px] uppercase text-cream-2/60">Himmerlandskød · pr. serveret kg</div><div id="y-hk" class="font-display text-2xl font-bold text-brass-l">–</div></div>
+    </div>
+    <div id="y-verdict" class="mt-4 rounded-xl p-4 text-sm text-center font-semibold"></div>
+    <p class="text-[11px] text-ink/45 mt-3">Standard yield 70 % · Himmerlandskød yield 82 % (mindre svind/afpuds). Vejledende.</p>`;
+}
+
+function wireTool(type){
+  if(type==="shrink"){
+    const covers=document.getElementById('t-covers'), portion=document.getElementById('t-portion');
+    const upd=()=>{
+      const c=+covers.value, p=+portion.value;
+      document.getElementById('t-covers-v').textContent=c;
+      document.getElementById('t-portion-v').textContent=p+' g';
+      const extraPerPortion = p*0.12; // ~12%-point less shrink => more served
+      const weekG = extraPerPortion*c;
+      const yearKg = weekG*52/1000;
+      document.getElementById('t-out-grams').textContent = (weekG/1000).toFixed(1)+' kg';
+      document.getElementById('t-out-kg').textContent = Math.round(yearKg)+' kg';
+    };
+    covers.oninput=portion.oninput=upd; upd();
+  }
+  else if(type==="margin"){
+    const buy=document.getElementById('t-buy'), w=document.getElementById('t-weight');
+    const upd=()=>{
+      const b=+buy.value, kg=+w.value;
+      document.getElementById('t-buy-v').textContent=b+' kr.';
+      document.getElementById('t-weight-v').textContent=kg+' kg';
+      const usable=kg*0.95;
+      const rib=usable*0.45, steg=usable*0.35, fars=usable*0.15;
+      const revRib=rib*380, revSteg=steg*220, revFars=fars*150;
+      const cost=kg*b;
+      const total=revRib+revSteg+revFars-cost;
+      const k=v=>Math.round(v).toLocaleString('da-DK')+' kr.';
+      document.getElementById('m-ribeye').textContent=k(revRib);
+      document.getElementById('m-steg').textContent=k(revSteg);
+      document.getElementById('m-fars').textContent=k(revFars);
+      document.getElementById('m-total').textContent=k(total);
+    };
+    buy.oninput=w.oninput=upd; upd();
+  }
+  else if(type==="yield"){
+    const std=document.getElementById('t-std'), hk=document.getElementById('t-hk');
+    const upd=()=>{
+      const s=+std.value, h=+hk.value;
+      document.getElementById('t-std-v').textContent=s+' kr.';
+      document.getElementById('t-hk-v').textContent=h+' kr.';
+      const stdServed=s/0.70, hkServed=h/0.82;
+      document.getElementById('y-std').textContent=stdServed.toFixed(0)+' kr.';
+      document.getElementById('y-hk').textContent=hkServed.toFixed(0)+' kr.';
+      const v=document.getElementById('y-verdict');
+      if(hkServed<=stdServed){
+        v.className="mt-4 rounded-xl p-4 text-sm text-center font-semibold bg-brass/15 ring-1 ring-brass/40 text-brass-d";
+        v.innerHTML=`✓ Himmerlandskød er <b>${(stdServed-hkServed).toFixed(0)} kr/kg billigere</b> pr. faktisk serveret kød — trods højere listepris.`;
+      } else {
+        v.className="mt-4 rounded-xl p-4 text-sm text-center font-semibold bg-cream-2 text-ink/70";
+        v.innerHTML=`Ved denne kilopris er merprisen <b>${(hkServed-stdServed).toFixed(0)} kr/kg</b> serveret — argumentér på kvalitet, velfærd & ensartethed.`;
+      }
+    };
+    std.oninput=hk.oninput=upd; upd();
+  }
+}
+
+/* ---------- LEAD SUBMIT ---------- */
+function submitLead(e){
+  e.preventDefault();
+  const form=e.target;
+  form.innerHTML=`<div class="text-center py-10 pop">
+    <div class="mx-auto h-16 w-16 rounded-full bg-brass/15 ring-1 ring-brass/40 grid place-items-center text-brass-d">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+    </div>
+    <h3 class="font-display text-2xl font-bold text-forest mt-5">Tak — dit salgskit er på vej!</h3>
+    <p class="text-sm text-ink/70 mt-2 max-w-sm mx-auto">Du modtager din skræddersyede PDF, printklare diskeskilte og varenumre i indbakken inden for få minutter. En kontaktperson fra Himmerlandskød følger op.</p>
+  </div>`;
+}
+
+/* keyboard: ESC closes modal */
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+</script>
+</body>
+</html>
